@@ -5,7 +5,7 @@ import validate from "./middlewares/valitade.middleware";
 const app = express();
 
 app.use(express.json());
-app.use(validate);
+//app.use(validate);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running!");
