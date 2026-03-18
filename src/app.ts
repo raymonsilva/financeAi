@@ -1,5 +1,14 @@
-import app from "./server";
+import express, { Request, Response } from "express";
+import { errorMiddleware } from "./middlewares/error.middleware";
 
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
+const app = express();
+
+app.use(express.json());
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Server is running!");
 });
+
+app.use(errorMiddleware);
+
+export default app;
