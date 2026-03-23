@@ -14,7 +14,12 @@ export const gastosValidationSchema = z.object({
     data: z.coerce.date()
         .optional()
         .default(() => new Date()),
+    userId: z.string().min(1, "userId é obrigatório"),
 });
+
+export const gastosUpdateValidationSchema = gastosValidationSchema
+    .omit({ userId: true })
+    .partial();
 
 
 export type Gastos = z.infer<typeof gastosValidationSchema>;
@@ -36,6 +41,11 @@ const GastosSchema = new mongoose.Schema({
     data: {
         type: Date,
         default: Date.now,
+    },
+    userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
     },
     createdAt: {
         type: Date,

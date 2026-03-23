@@ -13,11 +13,11 @@ export type User = z.infer<typeof userValidationSchema>;
 const UserSchema = new mongoose.Schema({
     nome: {
         type: String,
-        require: true
+        required: true
     },
     salario: {
-        type: String,
-        require: true
+        type: Number,
+        required: true
     }
 });
 

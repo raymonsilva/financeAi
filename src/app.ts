@@ -9,6 +9,20 @@ app.use(express.json());
 app.use("/gastos", gastosRouter);
 app.use("/user", userRouter);
 
+app.get("/resumo", (req: Request, res: Response) => {
+  const query = new URLSearchParams(req.query as Record<string, string>).toString();
+  const target = query ? `/gastos/resumo?${query}` : "/gastos/resumo";
+  return res.redirect(target);
+});
+
+app.get("/resumo/:userId", (req: Request, res: Response) => {
+  const query = new URLSearchParams(req.query as Record<string, string>).toString();
+  const target = query
+    ? `/gastos/resumo/${req.params.userId}?${query}`
+    : `/gastos/resumo/${req.params.userId}`;
+  return res.redirect(target);
+});
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Server is running!");
 });
