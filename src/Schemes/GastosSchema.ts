@@ -16,10 +16,10 @@ export const gastosValidationSchema = z.object({
         .default(() => new Date()),
 });
 
-// Tipo inferido do Zod
+
 export type Gastos = z.infer<typeof gastosValidationSchema>;
 
-// Schema do Mongoose para persistência no banco
+// Schema do Mongoose para armazenar dados
 const GastosSchema = new mongoose.Schema({
     descricao: {
         type: String,
