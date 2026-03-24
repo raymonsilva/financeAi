@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import validate from '../middlewares/validate.middleware';
+import { authMiddleware } from '../middlewares/auth.middleware';
 import { gastosValidationSchema, gastosUpdateValidationSchema, GastosModel } from '../Schemes/GastosSchema';
 import { GastosService } from '../services/gastos.service';
 import { UserModel } from '../Schemes/UserSchema';
@@ -8,30 +9,15 @@ import { UserModel } from '../Schemes/UserSchema';
 const gastosService = new GastosService();
 const router = express.Router();
 
-const getUserId = (req: express.Request) => {
-    const queryUserIdRaw = req.query.userId ?? req.query.userID ?? req.query.userid;
-    const bodyUserIdRaw = req.body?.userId ?? req.body?.userID ?? req.body?.userid;
-    const paramsUserIdRaw = req.params.userId ?? req.params.id;
-    const headerUserIdRaw = req.headers['x-user-id'] ?? req.headers['x-userid'] ?? req.headers['userid'];
-    const value = bodyUserIdRaw ?? queryUserIdRaw ?? paramsUserIdRaw ?? headerUserIdRaw;
-
-    if (Array.isArray(value)) {
-        return value[0]?.toString().trim();
-    }
-
-    return value?.toString().trim();
-};
-
-const handleResumo = async (req: express.Request, res: express.Response) => {
+const handleResumo = async (req: express.Request, res: express.Response, userId: string) => {
     try {
         const { mes, ano } = req.query;
         const now = new Date();
         const mesNumero = mes ? Number(mes) : now.getMonth() + 1;
         const anoNumero = ano ? Number(ano) : now.getFullYear();
 
-        const userId = getUserId(req) as string;
         if (!userId) {
-            return res.status(400).json({ message: "userId é obrigatório (envie em body, query, params ou header x-user-id)." });
+            return res.status(400).json({ message: "userId é obrigatório." });
         }
 
         if (!mongoose.isValidObjectId(userId)) {
@@ -72,30 +58,31 @@ const handleResumo = async (req: express.Request, res: express.Response) => {
 };
 
 // Rota para obter os gastos
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
     try {
-        const userId = getUserId(req);
-        if (userId && !mongoose.isValidObjectId(userId)) {
+        const userId = req.userId;
+        if (!userId || !mongoose.isValidObjectId(userId)) {
             return res.status(400).json({ message: "userId inválido." });
         }
 
-        const filter = userId ? { userId } : {};
-        const gastos = await GastosModel.find(filter).sort({ data: -1, createdAt: -1 });
+        const gastos = await GastosModel.find({ userId }).sort({ data: -1, createdAt: -1 });
         return res.json(gastos);
     } catch (error) {
-        return res.status(500).json({ message: "Erro ao obter gastos." });
+        console.error('Erro ao obter gastos:', error);
+        return res.status(500).json({ message: "Erro ao obter gastos.", error: (error as any).message });
     }
 });
 
-router.get("/resumo", async(req, res) => {
-    return handleResumo(req, res);
+router.get("/resumo", authMiddleware, async(req, res) => {
+    return handleResumo(req, res, req.userId as string);
 });
 
-router.get("/resumo/:userId", async(req, res) => {
-    return handleResumo(req, res);
+router.get("/resumo/:userId", authMiddleware, async(req, res) => {
+    const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
+    return handleResumo(req, res, userId);
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", authMiddleware, async (req, res) => {
     try{
         const gasto = await GastosModel.findById(req.params.id);
         if (!gasto) {
@@ -108,15 +95,11 @@ router.get("/:id", async (req, res) => {
 });
 
 // Rota para criar um novo gasto
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
     try {
-        const userId = getUserId(req);
+        const userId = req.userId;
         if (!userId) {
-            return res.status(400).json({ message: "userId é obrigatório (envie em body, query, params ou header x-user-id)." });
-        }
-
-        if (!mongoose.isValidObjectId(userId)) {
-            return res.status(400).json({ message: "userId inválido." });
+            return res.status(400).json({ message: "userId não encontrado no token." });
         }
 
         const payload = {
@@ -137,7 +120,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.put("/:id", validate(gastosUpdateValidationSchema), async (req, res) => {
+router.put("/:id", authMiddleware, validate(gastosUpdateValidationSchema), async (req, res) => {
     try{
         const gasto = await GastosModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!gasto) {
@@ -150,7 +133,7 @@ router.put("/:id", validate(gastosUpdateValidationSchema), async (req, res) => {
     }
 });
 
-router.delete("/:id", async( req, res) => {
+router.delete("/:id", authMiddleware, async( req, res) => {
     try {
         const gasto = await GastosModel.findByIdAndDelete(req.params.id);
         if (!gasto){
