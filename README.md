@@ -1,4 +1,4 @@
-# FinanceAI
+# FinanceControl
 
 ## Como o projeto funciona
 
