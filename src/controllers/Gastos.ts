@@ -46,11 +46,14 @@ const handleResumo = async (req: express.Request, res: express.Response, userId:
 
         const saldo = usuario.salario - totalGastos;
 
+        const status = saldo >= 0 ? "Dentro do orçamento" : "Excedido o orçamento";
+
         return res.json({
             nome: usuario.nome,
             salario: usuario.salario,
             gastos: totalGastos,
-            saldo
+            saldo,
+            status
         });
     } catch (error) {
         return res.status(500).json({ message: "Erro ao calcular resumo." });
@@ -84,7 +87,18 @@ router.get("/resumo/:userId", authMiddleware, async(req, res) => {
 
 router.get("/:id", authMiddleware, async (req, res) => {
     try{
-        const gasto = await GastosModel.findById(req.params.id);
+        const { id } = req.params;
+        const userId = req.userId;
+
+        if (!userId) {
+            return res.status(400).json({ message: "userId inválido." });
+        }
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({ message: "id inválido." });
+        }
+
+        const gasto = await GastosModel.findOne({ _id: id, userId });
         if (!gasto) {
             return res.status(404).json({ message: "Gasto não encontrado." });
         }
@@ -122,7 +136,22 @@ router.post("/", authMiddleware, async (req, res) => {
 
 router.put("/:id", authMiddleware, validate(gastosUpdateValidationSchema), async (req, res) => {
     try{
-        const gasto = await GastosModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const { id } = req.params;
+        const userId = req.userId;
+
+        if (!userId) {
+            return res.status(400).json({ message: "userId inválido." });
+        }
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({ message: "id inválido." });
+        }
+
+        const gasto = await GastosModel.findOneAndUpdate(
+            { _id: id, userId },
+            req.body,
+            { new: true }
+        );
         if (!gasto) {
             return res.status(404).json({ message: "Gasto não encontrado." });
         }
@@ -135,7 +164,18 @@ router.put("/:id", authMiddleware, validate(gastosUpdateValidationSchema), async
 
 router.delete("/:id", authMiddleware, async( req, res) => {
     try {
-        const gasto = await GastosModel.findByIdAndDelete(req.params.id);
+        const { id } = req.params;
+        const userId = req.userId;
+
+        if (!userId) {
+            return res.status(400).json({ message: "userId inválido." });
+        }
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({ message: "id inválido." });
+        }
+
+        const gasto = await GastosModel.findOneAndDelete({ _id: id, userId });
         if (!gasto){
             return res.status(404).json({ message: "Gasto não encontrado." });
         }

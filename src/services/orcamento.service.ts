@@ -36,7 +36,7 @@ export class OrcamentoService {
         return await orcamento.save();
     }
 
-    async gastoarOrcamento(id: string, valor: number) {
+    async gastoOrcamento(id: string, valor: number) {
         const orcamento = await OrcamentoMensalModel.findById(id);
         if (!orcamento) {
             throw new Error("Orçamento não encontrado.");
@@ -48,12 +48,54 @@ export class OrcamentoService {
         return await orcamento.save();
     }
 
-    async limiteGastos(id: string, limite: number) {
-        const orcamento = await OrcamentoMensalModel.findById(id);
+    async limiteGastos(id: string, userId: string, limite: number) {
+        const orcamento = await OrcamentoMensalModel.findOne({
+            _id: id,
+            userId: new mongoose.Types.ObjectId(userId)
+        });
+
         if (!orcamento) {
-            throw new Error("Orçamento não encontrado.");
-        }       
+            return null;
+        }
+
         orcamento.limiteGastos = limite;
         return await orcamento.save();
+    }
+
+    async calcularStatusOrcamento(userId: string, mes: number, ano: number) {
+        const totalGastos = await this.calcularTotalMes(userId, mes, ano);
+        const orcamento = await OrcamentoMensalModel.findOne({
+            userId: new mongoose.Types.ObjectId(userId),
+            mes: mes,
+            ano: ano
+        });
+
+        if(!orcamento) {
+            throw new Error("Orçamento mensal não encontrado para o mês e ano especificados.");
+        }
+        const limite = orcamento.limiteGastos || 0;
+        const status = totalGastos > limite ? "Excedido" : "Dentro do limite";
+        return { totalGastos, limite, status };
+    }
+
+    async percentualConsumido(userId: string, mes: number, ano: number) {
+        const dados = await this.calcularStatusOrcamento(userId, mes, ano);
+        
+        if(dados.limite === 0) {
+            return { ...dados, percentual: 0, status: "ok" };
+        }
+        
+        const percentual = (dados.totalGastos / dados.limite) * 100;
+        
+        let status: string;
+        if (percentual < 80) {
+            status = "ok";
+        } else if (percentual < 100) {
+            status = "atencao";
+        } else {
+            status = "estourado";
+        }
+        
+        return { ...dados, percentual, status };
     }
 }

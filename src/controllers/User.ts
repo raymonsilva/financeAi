@@ -92,6 +92,10 @@ router.get("/", authMiddleware, async(req, res) => {
 
 router.get("/:id", authMiddleware, async(req, res) => {
     try{
+        if (req.userId !== req.params.id) {
+            return res.status(403).json({ message: "Você não tem permissão para acessar este usuário" });
+        }
+
         const user = await UserModel.findById(req.params.id);
         if (!user) {
             return res.status(404).json({ message: "Usuário não encontrado" });
