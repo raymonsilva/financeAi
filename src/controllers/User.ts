@@ -3,7 +3,6 @@ import validate from '../middlewares/validate.middleware';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { UserModel, userValidationSchema } from '../Schemes/UserSchema';
 import { JWTService } from '../utils/jwt';
-import { env } from '../config/env';
 import { z } from 'zod';
 
 const router = express.Router();
@@ -26,7 +25,7 @@ router.post("/register", validate(userValidationSchema), async(req, res) => {
             return res.status(400).json({ message: "Email já registrado" });
         }
 
-        const role = env.ADMIN_EMAIL && req.body.email === env.ADMIN_EMAIL ? 'admin' : 'user';
+        const role = 'user';
         const user = new UserModel({ ...req.body, role });
         await user.save();
         
@@ -56,14 +55,9 @@ router.post("/login", validate(loginSchema), async(req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await UserModel.findOne({ email });
+        const user = await UserModel.findOne({ email }).select('+password');
         if (!user) {
             return res.status(401).json({ message: "Email ou senha inválidos" });
-        }
-
-        if (env.ADMIN_EMAIL && user.email === env.ADMIN_EMAIL && user.role !== 'admin') {
-            user.role = 'admin';
-            await user.save();
         }
 
         const isPasswordValid = await (user as any).comparePassword(password);
@@ -95,7 +89,7 @@ router.post("/login", validate(loginSchema), async(req, res) => {
 // Rota para obter usuário (protegida)
 router.get("/", authMiddleware, async(req, res) => {
     try{
-        const user = await UserModel.findById(req.userId);
+        const user = await UserModel.findById(req.userId).select('-password');
         if (!user) {
             return res.status(404).json({ message: "Usuário não encontrado" });
         }
@@ -111,7 +105,7 @@ router.get("/:id", authMiddleware, async(req, res) => {
             return res.status(403).json({ message: "Você não tem permissão para acessar este usuário" });
         }
 
-        const user = await UserModel.findById(req.params.id);
+        const user = await UserModel.findById(req.params.id).select('-password');
         if (!user) {
             return res.status(404).json({ message: "Usuário não encontrado" });
         }
@@ -127,7 +121,7 @@ router.put("/:id", authMiddleware, validate(userValidationSchema), async(req, re
             return res.status(403).json({ message: "Você não tem permissão para atualizar este usuário" });
         }
 
-        const user = await UserModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const user = await UserModel.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
         if(!user){
             return res.status(404).json({ message: "Usuário não encontrado"});
         }
@@ -170,7 +164,7 @@ router.delete("/:id", authMiddleware, async(req, res) => {
             return res.status(403).json({ message: "Você não tem permissão para deletar este usuário" });
         }
 
-        const user = await UserModel.findByIdAndDelete(req.params.id);
+        const user = await UserModel.findByIdAndDelete(req.params.id).select('-password');
         if(!user){
             return res.status(404).json({ message: "Usuário não encontrado."});
         }
