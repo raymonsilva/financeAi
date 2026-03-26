@@ -82,6 +82,11 @@ router.get("/resumo", authMiddleware, async(req, res) => {
 
 router.get("/resumo/:userId", authMiddleware, async(req, res) => {
     const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
+
+    if (req.userRole !== 'admin' && req.userId !== userId) {
+        return res.status(403).json({ message: "Você não tem permissão para acessar este resumo." });
+    }
+
     return handleResumo(req, res, userId);
 });
 
