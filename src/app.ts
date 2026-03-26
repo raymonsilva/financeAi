@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import gastosRouter from "./controllers/Gastos";
 import userRouter from "./controllers/User";
@@ -28,7 +28,7 @@ const matchesOriginRule = (origin: string, rule: string) => {
   return wildcardRegex.test(normalizedOrigin);
 };
 
-app.use(cors({
+const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOriginRules.some((rule) => matchesOriginRule(origin, rule))) {
       callback(null, true);
@@ -36,8 +36,13 @@ app.use(cors({
     }
 
     callback(new Error("Origin not allowed by CORS"));
-  }
-}));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 app.use("/gastos", gastosRouter);
 app.use("/orcamentos", orcamentoRouter);
