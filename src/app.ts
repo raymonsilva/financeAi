@@ -23,8 +23,12 @@ const matchesOriginRule = (origin: string, rule: string) => {
     return normalizedOrigin === normalizedRule;
   }
 
-  const escapedRule = normalizedRule.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
-  const wildcardRegex = new RegExp(`^${escapedRule.replace(/\\\*/g, ".*")}$`);
+  const wildcardRegexText = normalizedRule
+    .split("*")
+    .map((segment) => segment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join(".*");
+
+  const wildcardRegex = new RegExp(`^${wildcardRegexText}$`);
   return wildcardRegex.test(normalizedOrigin);
 };
 
