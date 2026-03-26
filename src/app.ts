@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import { errorMiddleware } from "./middlewares/error.middleware";
 import gastosRouter from "./controllers/Gastos";
 import userRouter from "./controllers/User";
@@ -9,20 +9,72 @@ import { env } from "./config/env";
 
 const app = express();
 
-const allowedOrigins = env.CORS_ORIGIN
+const normalizeOrigin = (value: string) => value.trim().replace(/\/+$/, "");
+
+const allowedOriginRules = env.CORS_ORIGIN
   ? env.CORS_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean)
   : ["http://localhost:5173"];
 
-app.use(cors({
+const matchesOriginRule = (origin: string, rule: string) => {
+  const normalizedOrigin = normalizeOrigin(origin);
+  const normalizedRule = normalizeOrigin(rule);
+
+  if (!normalizedRule.includes("*")) {
+    return normalizedOrigin === normalizedRule;
+  }
+
+  const wildcardRegexText = normalizedRule
+    .split("*")
+    .map((segment) => segment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join(".*");
+
+  const wildcardRegex = new RegExp(`^${wildcardRegexText}$`);
+  return wildcardRegex.test(normalizedOrigin);
+};
+
+const isOriginAllowed = (origin?: string) => {
+  if (!origin) {
+    return true;
+  }
+
+  return allowedOriginRules.some((rule) => matchesOriginRule(origin, rule));
+};
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (typeof origin === "string" && isOriginAllowed(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Vary", "Origin");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  }
+
+  if (req.method === "OPTIONS") {
+    if (typeof origin === "string" && !isOriginAllowed(origin)) {
+      return res.status(403).json({ message: "Origin not allowed by CORS" });
+    }
+    return res.sendStatus(204);
+  }
+
+  return next();
+});
+
+const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (isOriginAllowed(origin)) {
       callback(null, true);
       return;
     }
 
     callback(new Error("Origin not allowed by CORS"));
-  }
-}));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+app.use(cors(corsOptions));
+app.options(/.*/, cors(corsOptions));
 app.use(express.json());
 app.use("/gastos", gastosRouter);
 app.use("/orcamentos", orcamentoRouter);
