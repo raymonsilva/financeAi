@@ -9,13 +9,28 @@ import { env } from "./config/env";
 
 const app = express();
 
-const allowedOrigins = env.CORS_ORIGIN
+const normalizeOrigin = (value: string) => value.trim().replace(/\/+$/, "");
+
+const allowedOriginRules = env.CORS_ORIGIN
   ? env.CORS_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean)
   : ["http://localhost:5173"];
 
+const matchesOriginRule = (origin: string, rule: string) => {
+  const normalizedOrigin = normalizeOrigin(origin);
+  const normalizedRule = normalizeOrigin(rule);
+
+  if (!normalizedRule.includes("*")) {
+    return normalizedOrigin === normalizedRule;
+  }
+
+  const escapedRule = normalizedRule.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
+  const wildcardRegex = new RegExp(`^${escapedRule.replace(/\\\*/g, ".*")}$`);
+  return wildcardRegex.test(normalizedOrigin);
+};
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOriginRules.some((rule) => matchesOriginRule(origin, rule))) {
       callback(null, true);
       return;
     }
