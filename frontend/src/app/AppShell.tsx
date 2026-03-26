@@ -13,7 +13,7 @@ export const AppShell = () => {
   return (
     <div className="layout">
       <header className="topbar">
-        <h2>FinanceAI</h2>
+        <h2>Finance Control</h2>
         <nav className="row-inline">
           <Link to="/">Dashboard</Link>
           <Link to="/gastos">Gastos</Link>
