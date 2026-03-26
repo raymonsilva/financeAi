@@ -5,10 +5,24 @@ import gastosRouter from "./controllers/Gastos";
 import userRouter from "./controllers/User";
 import orcamentoRouter from "./controllers/OrcamentoMensal";
 import adminRouter from "./controllers/Admin";
+import { env } from "./config/env";
 
 const app = express();
 
-app.use(cors({ origin: "http://localhost:5173" }));
+const allowedOrigins = env.CORS_ORIGIN
+  ? env.CORS_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean)
+  : ["http://localhost:5173"];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("Origin not allowed by CORS"));
+  }
+}));
 app.use(express.json());
 app.use("/gastos", gastosRouter);
 app.use("/orcamentos", orcamentoRouter);
