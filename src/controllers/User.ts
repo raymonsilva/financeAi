@@ -3,6 +3,7 @@ import validate from '../middlewares/validate.middleware';
 import { authMiddleware } from '../middlewares/auth.middleware';
 import { UserModel, userValidationSchema } from '../Schemes/UserSchema';
 import { JWTService } from '../utils/jwt';
+import { env } from '../config/env';
 import { z } from 'zod';
 
 const router = express.Router();
@@ -13,6 +14,10 @@ const loginSchema = z.object({
     password: z.string().min(1, "Senha é obrigatória")
 });
 
+const salarioUpdateSchema = z.object({
+    salario: z.number().positive("Valor deve ser positivo")
+});
+
 // Rota de registr (sem autenticação)
 router.post("/register", validate(userValidationSchema), async(req, res) => {
     try {
@@ -21,12 +26,14 @@ router.post("/register", validate(userValidationSchema), async(req, res) => {
             return res.status(400).json({ message: "Email já registrado" });
         }
 
-        const user = new UserModel(req.body);
+        const role = env.ADMIN_EMAIL && req.body.email === env.ADMIN_EMAIL ? 'admin' : 'user';
+        const user = new UserModel({ ...req.body, role });
         await user.save();
         
         const token = JWTService.generateToken({
             userId: user._id.toString(),
-            email: user.email
+            email: user.email,
+            role: user.role
         });
 
         return res.status(201).json({ 
@@ -35,7 +42,8 @@ router.post("/register", validate(userValidationSchema), async(req, res) => {
             user: {
                 id: user._id,
                 email: user.email,
-                nome: user.nome
+                nome: user.nome,
+                role: user.role
             }
         });
     } catch(error){
@@ -53,6 +61,11 @@ router.post("/login", validate(loginSchema), async(req, res) => {
             return res.status(401).json({ message: "Email ou senha inválidos" });
         }
 
+        if (env.ADMIN_EMAIL && user.email === env.ADMIN_EMAIL && user.role !== 'admin') {
+            user.role = 'admin';
+            await user.save();
+        }
+
         const isPasswordValid = await (user as any).comparePassword(password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: "Email ou senha inválidos" });
@@ -60,7 +73,8 @@ router.post("/login", validate(loginSchema), async(req, res) => {
 
         const token = JWTService.generateToken({
             userId: user._id.toString(),
-            email: user.email
+            email: user.email,
+            role: user.role
         });
 
         return res.json({ 
@@ -69,7 +83,8 @@ router.post("/login", validate(loginSchema), async(req, res) => {
             user: {
                 id: user._id,
                 email: user.email,
-                nome: user.nome
+                nome: user.nome,
+                role: user.role
             }
         });
     } catch(error){
@@ -119,6 +134,33 @@ router.put("/:id", authMiddleware, validate(userValidationSchema), async(req, re
         return res.status(200).json({ message: "Usuário atualizado com sucesso!", user});
     } catch(error){
         return res.status(500).json({ message: "Erro ao atualizar usuário."});
+    }
+});
+
+router.patch("/:id/salario", authMiddleware, validate(salarioUpdateSchema), async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (req.userId !== id && req.userRole !== 'admin') {
+            return res.status(403).json({ message: "Você não tem permissão para atualizar o salário deste usuário" });
+        }
+
+        const user = await UserModel.findByIdAndUpdate(
+            id,
+            { salario: req.body.salario },
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({ message: "Usuário não encontrado" });
+        }
+
+        return res.status(200).json({
+            message: "Salário atualizado com sucesso!",
+            user
+        });
+    } catch (error) {
+        return res.status(500).json({ message: "Erro ao atualizar salário." });
     }
 });
 

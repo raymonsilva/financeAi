@@ -1,5 +1,6 @@
 import express  from "express";
 import mongoose from "mongoose";
+import { z } from "zod";
 import validate from "../middlewares/validate.middleware";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { orcamentoMensalValidationSchema, OrcamentoMensalModel } from "../Schemes/OrçamentoMensalSchema";
@@ -8,6 +9,11 @@ import { OrcamentoService } from "../services/orcamento.service";
 
 const orcamentoService = new OrcamentoService();
 const router = express.Router();
+
+const orcamentoUpdateSchema = z.object({
+    valor: z.number().positive("Valor deve ser positivo").optional(),
+    limiteGastos: z.number().positive("Limite de gastos deve ser positivo").nullable().optional()
+});
 
 router.get("/", authMiddleware, async (req, res) => {
     try {
@@ -131,6 +137,78 @@ router.put("/:id/limite", authMiddleware, async (req, res) => {
     } catch (error) {
         console.error("Erro ao atualizar limite de gastos:", error);
         return res.status(500).json({ message: "Erro ao atualizar limite de gastos." });
+    }
+});
+
+router.put("/:id", authMiddleware, validate(orcamentoUpdateSchema), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.userId;
+
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "Parâmetro id inválido." });
+        }
+
+        if (!userId) {
+            return res.status(400).json({ message: "userId é obrigatório." });
+        }
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({ message: "id inválido." });
+        }
+
+        const orcamento = await OrcamentoMensalModel.findOneAndUpdate(
+            { _id: id, userId: new mongoose.Types.ObjectId(userId) },
+            req.body,
+            { new: true }
+        );
+
+        if (!orcamento) {
+            return res.status(404).json({ message: "Orçamento não encontrado." });
+        }
+
+        return res.status(200).json({
+            message: "Orçamento atualizado com sucesso.",
+            data: orcamento
+        });
+    } catch (error) {
+        console.error("Erro ao atualizar orçamento:", error);
+        return res.status(500).json({ message: "Erro ao atualizar orçamento." });
+    }
+});
+
+router.delete("/:id", authMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.userId;
+
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({ message: "Parâmetro id inválido." });
+        }
+
+        if (!mongoose.isValidObjectId(id)) {
+            return res.status(400).json({ message: "id inválido." });
+        }
+
+        const filter: Record<string, unknown> = { _id: id };
+
+        if (req.userRole !== 'admin') {
+            if (!userId) {
+                return res.status(400).json({ message: "userId é obrigatório." });
+            }
+            filter.userId = new mongoose.Types.ObjectId(userId);
+        }
+
+        const deleted = await OrcamentoMensalModel.findOneAndDelete(filter);
+
+        if (!deleted) {
+            return res.status(404).json({ message: "Orçamento não encontrado." });
+        }
+
+        return res.status(200).json({ message: "Orçamento removido com sucesso." });
+    } catch (error) {
+        console.error("Erro ao remover orçamento:", error);
+        return res.status(500).json({ message: "Erro ao remover orçamento." });
     }
 });
 
