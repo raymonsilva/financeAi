@@ -28,9 +28,37 @@ const matchesOriginRule = (origin: string, rule: string) => {
   return wildcardRegex.test(normalizedOrigin);
 };
 
+const isOriginAllowed = (origin?: string) => {
+  if (!origin) {
+    return true;
+  }
+
+  return allowedOriginRules.some((rule) => matchesOriginRule(origin, rule));
+};
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (typeof origin === "string" && isOriginAllowed(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Vary", "Origin");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  }
+
+  if (req.method === "OPTIONS") {
+    if (typeof origin === "string" && !isOriginAllowed(origin)) {
+      return res.status(403).json({ message: "Origin not allowed by CORS" });
+    }
+    return res.sendStatus(204);
+  }
+
+  return next();
+});
+
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOriginRules.some((rule) => matchesOriginRule(origin, rule))) {
+    if (isOriginAllowed(origin)) {
       callback(null, true);
       return;
     }
