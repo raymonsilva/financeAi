@@ -2,7 +2,20 @@ import axios from "axios";
 import { authStorage } from "./auth-storage";
 import { ApiError, getApiErrorMessage } from "../types/api";
 
-const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+const normalizeApiUrl = (rawUrl?: string) => {
+  if (!rawUrl) {
+    return "http://localhost:3000";
+  }
+
+  const trimmed = rawUrl.trim().replace(/\/+$/, "");
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  return `https://${trimmed}`;
+};
+
+const API_URL = normalizeApiUrl(import.meta.env.VITE_API_URL);
 
 export const http = axios.create({
   baseURL: API_URL,
