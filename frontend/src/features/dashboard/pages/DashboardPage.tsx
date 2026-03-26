@@ -99,7 +99,7 @@ export const DashboardPage = () => {
       </div>
 
       <article className="card">
-        <h3>Status do Orcamento</h3>
+        <h3>Status do Orçamento</h3>
         {status ? (
           <>
             <p>Consumo: {status.percentual.toFixed(1)}%</p>
@@ -107,14 +107,14 @@ export const DashboardPage = () => {
             <p>Situação: {status.status}</p>
           </>
         ) : (
-          <p>Ainda nao existe orcamento para este mes. Crie em Orcamento.</p>
+          <p>Ainda não existe orçamento para este mês. Crie em Orçamento.</p>
         )}
       </article>
 
       <form className="card form-grid" onSubmit={handleSalaryUpdate}>
-        <h3>Atualizar salario</h3>
+        <h3>Atualizar salário</h3>
         <label>
-          Novo salario
+          Novo salário
           <input
             type="number"
             min={0}
@@ -125,7 +125,7 @@ export const DashboardPage = () => {
           />
         </label>
         <button type="submit" disabled={salarioMutation.isPending}>
-          {salarioMutation.isPending ? "Atualizando..." : "Salvar salario"}
+          {salarioMutation.isPending ? "Atualizando..." : "Salvar salário"}
         </button>
         {salarioFeedback && <p>{salarioFeedback}</p>}
       </form>

@@ -52,7 +52,7 @@ export const GastosPage = () => {
       <h1>Gastos</h1>
       <form className="card form-grid" onSubmit={handleSubmit}>
         <label>
-          Descricao
+          Descrição
           <input value={descricao} onChange={(e) => setDescricao(e.target.value)} required />
         </label>
         <label>

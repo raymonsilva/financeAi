@@ -18,7 +18,7 @@ export const AdminPage = () => {
   const cleanupMutation = useMutation({
     mutationFn: adminApi.cleanup,
     onSuccess: () => {
-      setFeedback("Limpeza concluida com sucesso.");
+      setFeedback("Limpeza concluída com sucesso.");
       queryClient.invalidateQueries({ queryKey: ["admin-full"] });
       queryClient.invalidateQueries({ queryKey: ["gastos"] });
       queryClient.invalidateQueries({ queryKey: ["resumo"] });
@@ -54,7 +54,7 @@ export const AdminPage = () => {
   }
 
   if (adminQuery.isError || !adminQuery.data) {
-    return <p className="error">Nao foi possivel carregar os dados administrativos.</p>;
+    return <p className="error">Não foi possível carregar os dados administrativos.</p>;
   }
 
   const { totals, users, gastos, orcamentos } = adminQuery.data;
@@ -65,7 +65,7 @@ export const AdminPage = () => {
 
       <div className="grid-3">
         <article className="card">
-          <h3>Usuarios</h3>
+          <h3>Usuários</h3>
           <p>{totals.users}</p>
         </article>
         <article className="card">
@@ -73,7 +73,7 @@ export const AdminPage = () => {
           <p>{totals.gastos}</p>
         </article>
         <article className="card">
-          <h3>Orcamentos</h3>
+          <h3>Orçamentos</h3>
           <p>{totals.orcamentos}</p>
         </article>
       </div>
@@ -90,11 +90,11 @@ export const AdminPage = () => {
             checked={clearOrcamentos}
             onChange={(e) => setClearOrcamentos(e.target.checked)}
           />
-          Limpar orcamentos
+          Limpar orçamentos
         </label>
         <label className="row-inline">
           <input type="checkbox" checked={clearUsers} onChange={(e) => setClearUsers(e.target.checked)} />
-          Limpar usuarios nao-admin
+          Limpar usuários não-admin
         </label>
         <button type="button" onClick={handleCleanup} disabled={cleanupMutation.isPending}>
           {cleanupMutation.isPending ? "Executando..." : "Executar limpeza"}
@@ -103,7 +103,7 @@ export const AdminPage = () => {
       </article>
 
       <article className="card">
-        <h3>Usuarios cadastrados</h3>
+        <h3>Usuários cadastrados</h3>
         <ul className="list">
           {users.map((user) => (
             <li key={user._id} className="row-between">
@@ -115,7 +115,7 @@ export const AdminPage = () => {
       </article>
 
       <article className="card">
-        <h3>Ultimos gastos</h3>
+        <h3>Últimos gastos</h3>
         <ul className="list">
           {gastos.slice(0, 10).map((gasto) => (
             <li key={gasto._id} className="row-between">
@@ -127,7 +127,7 @@ export const AdminPage = () => {
       </article>
 
       <article className="card">
-        <h3>Orcamentos</h3>
+        <h3>Orçamentos</h3>
         <ul className="list">
           {orcamentos.slice(0, 10).map((orcamento) => (
             <li key={orcamento._id} className="row-between">

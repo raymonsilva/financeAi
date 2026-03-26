@@ -56,7 +56,7 @@ export const OrcamentoPage = () => {
       queryClient.invalidateQueries({ queryKey: ["orcamento-status"] });
     },
     onError: (err) => {
-      setError(err instanceof ApiError ? err.message : "Falha ao criar orcamento.");
+      setError(err instanceof ApiError ? err.message : "Falha ao criar orçamento.");
     }
   });
 
@@ -71,7 +71,7 @@ export const OrcamentoPage = () => {
       queryClient.invalidateQueries({ queryKey: ["resumo"] });
     },
     onError: (err) => {
-      setError(err instanceof ApiError ? err.message : "Falha ao atualizar orcamento.");
+      setError(err instanceof ApiError ? err.message : "Falha ao atualizar orçamento.");
     }
   });
 
@@ -139,13 +139,13 @@ export const OrcamentoPage = () => {
 
   return (
     <section className="page-grid">
-      <h1>Orcamento Mensal</h1>
+      <h1>Orçamento Mensal</h1>
 
       {!orcamentoQuery.data ? (
         <form className="card form-grid" onSubmit={handleCreate}>
-          <h3>Criar Orcamento</h3>
+          <h3>Criar Orçamento</h3>
           <label>
-            Valor total do mes
+            Valor total do mês
             <input type="number" value={valor} onChange={(e) => setValor(e.target.value)} required />
           </label>
           <label>
@@ -159,8 +159,8 @@ export const OrcamentoPage = () => {
         </form>
       ) : (
         <article className="card">
-          <h3>Orcamento atual</h3>
-          <p>Mes/Ano: {orcamentoQuery.data.mes}/{orcamentoQuery.data.ano}</p>
+          <h3>Orçamento atual</h3>
+          <p>Mês/Ano: {orcamentoQuery.data.mes}/{orcamentoQuery.data.ano}</p>
           <p>Valor: R$ {orcamentoQuery.data.valor.toFixed(2)}</p>
           <p>Limite: R$ {(orcamentoQuery.data.limiteGastos ?? 0).toFixed(2)}</p>
           <form className="form-grid" onSubmit={handleUpdateOrcamento}>
@@ -187,7 +187,7 @@ export const OrcamentoPage = () => {
               />
             </label>
             <button type="submit" disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? "Salvando..." : "Salvar alteracoes"}
+              {updateMutation.isPending ? "Salvando..." : "Salvar alterações"}
             </button>
             <button
               type="button"
@@ -210,7 +210,7 @@ export const OrcamentoPage = () => {
             <p>Total gastos: R$ {statusQuery.data.totalGastos.toFixed(2)}</p>
             <p>Limite: R$ {statusQuery.data.limite.toFixed(2)}</p>
             <p>Percentual: {statusQuery.data.percentual.toFixed(1)}%</p>
-            <p>Situacao: {statusQuery.data.status}</p>
+            <p>Situação: {statusQuery.data.status}</p>
           </>
         )}
         {!statusQuery.isLoading && !statusQuery.isError && !statusQuery.data && (

@@ -21,7 +21,7 @@ export const RegisterPage = () => {
     setError(null);
 
     if (!strongPasswordRegex.test(password)) {
-      setError("A senha deve ter 8-20 caracteres, com maiuscula, numero e simbolo.");
+      setError("A senha deve ter 8-20 caracteres, com maiúscula, número e símbolo.");
       return;
     }
 
@@ -54,7 +54,7 @@ export const RegisterPage = () => {
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </label>
         <label>
-          Salario
+          Salário
           <input
             type="number"
             min={0}
@@ -81,7 +81,7 @@ export const RegisterPage = () => {
         </button>
       </form>
       <p>
-        Ja tem conta? <Link to="/login">Entrar</Link>
+        Já tem conta? <Link to="/login">Entrar</Link>
       </p>
     </div>
   );

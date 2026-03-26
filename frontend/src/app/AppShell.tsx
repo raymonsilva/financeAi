@@ -17,7 +17,7 @@ export const AppShell = () => {
         <nav className="row-inline">
           <Link to="/">Dashboard</Link>
           <Link to="/gastos">Gastos</Link>
-          <Link to="/orcamento">Orcamento</Link>
+          <Link to="/orcamento">Orçamento</Link>
           {session?.user.role === "admin" && <Link to="/admin">Admin</Link>}
         </nav>
         <div className="row-inline">

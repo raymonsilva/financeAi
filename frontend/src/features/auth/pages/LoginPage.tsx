@@ -45,7 +45,7 @@ export const LoginPage = () => {
         </button>
       </form>
       <p>
-        Nao tem conta? <Link to="/register">Criar conta</Link>
+        Não tem conta? <Link to="/register">Criar conta</Link>
       </p>
     </div>
   );
