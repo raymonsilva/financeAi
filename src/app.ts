@@ -5,6 +5,7 @@ import gastosRouter from "./controllers/Gastos";
 import userRouter from "./controllers/User";
 import orcamentoRouter from "./controllers/OrcamentoMensal";
 import adminRouter from "./controllers/Admin";
+import { setupSwagger } from "./docs/swagger";
 import { env } from "./config/env";
 
 const app = express();
@@ -76,6 +77,7 @@ const corsOptions: CorsOptions = {
 app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions));
 app.use(express.json());
+setupSwagger(app);
 app.use("/gastos", gastosRouter);
 app.use("/orcamentos", orcamentoRouter);
 app.use("/user", userRouter);
