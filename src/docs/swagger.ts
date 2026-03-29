@@ -6,7 +6,7 @@ const swaggerDefinition = {
   info: {
     title: "FinanceAI API",
     version: "1.0.0",
-    description: "Documentacao da API de controle financeiro"
+    description: "Documentação da API de controle financeiro"
   },
   servers: [
     {
@@ -17,7 +17,7 @@ const swaggerDefinition = {
   tags: [
     { name: "Auth", description: "Autenticacao e usuarios" },
     { name: "Gastos", description: "Gestao de gastos" },
-    { name: "Orcamentos", description: "Gestao de orcamentos mensais" },
+    { name: "Orçamentos", description: "Gestao de orçamentos mensais" },
     { name: "Admin", description: "Operacoes administrativas" },
     { name: "Health", description: "Status da API" }
   ],
@@ -291,8 +291,8 @@ const swaggerDefinition = {
     },
     "/orcamentos": {
       get: {
-        tags: ["Orcamentos"],
-        summary: "Obter orcamento mensal",
+        tags: ["Orçamentos"],
+        summary: "Obter orçamento mensal",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -307,12 +307,12 @@ const swaggerDefinition = {
           }
         ],
         responses: {
-          "200": { description: "Orcamento retornado" }
+          "200": { description: "Orçamento retornado" }
         }
       },
       post: {
-        tags: ["Orcamentos"],
-        summary: "Criar orcamento mensal",
+        tags: ["Orçamentos"],
+        summary: "Criar orçamento mensal",
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -323,14 +323,14 @@ const swaggerDefinition = {
           }
         },
         responses: {
-          "201": { description: "Orcamento criado" }
+          "201": { description: "Orçamento criado" }
         }
       }
     },
-    "/orcamentos/status": {
+    "/orçamentos/status": {
       get: {
-        tags: ["Orcamentos"],
-        summary: "Status de consumo do orcamento",
+        tags: ["Orçamentos"],
+        summary: "Status de consumo do orçamento",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
