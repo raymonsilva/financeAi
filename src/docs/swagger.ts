@@ -16,9 +16,9 @@ const swaggerDefinition = {
   ],
   tags: [
     { name: "Auth", description: "Autenticacao e usuarios" },
-    { name: "Gastos", description: "Gestao de gastos" },
-    { name: "Orçamentos", description: "Gestao de orçamentos mensais" },
-    { name: "Admin", description: "Operacoes administrativas" },
+    { name: "Gastos", description: "Gestão de gastos" },
+    { name: "Orçamentos", description: "Gestão de orçamentos mensais" },
+    { name: "Admin", description: "Operações administrativas" },
     { name: "Health", description: "Status da API" }
   ],
   components: {
@@ -351,8 +351,8 @@ const swaggerDefinition = {
     },
     "/orcamentos/{id}": {
       put: {
-        tags: ["Orcamentos"],
-        summary: "Atualizar orcamento",
+        tags: ["Orçamentos"],
+        summary: "Atualizar orçamento",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -371,12 +371,12 @@ const swaggerDefinition = {
           }
         },
         responses: {
-          "200": { description: "Orcamento atualizado" }
+          "200": { description: "Orçamento atualizado" }
         }
       },
       delete: {
-        tags: ["Orcamentos"],
-        summary: "Remover orcamento",
+        tags: ["Orçamentos"],
+        summary: "Remover orçamento ",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -387,7 +387,7 @@ const swaggerDefinition = {
           }
         ],
         responses: {
-          "200": { description: "Orcamento removido" }
+          "200": { description: "Orçamento removido" }
         }
       }
     },
