@@ -46,7 +46,7 @@ const swaggerDefinition = {
         properties: {
           nome: { type: "string", example: "Maria" },
           email: { type: "string", format: "email", example: "maria@email.com" },
-          password: { type: "string", minLength: 6, example: "senha123" },
+          password: { type: "string", minLength: 6, example: "Senha@123"},
           salario: { type: "number", example: 5500 }
         }
       },
@@ -55,7 +55,7 @@ const swaggerDefinition = {
         required: ["email", "password"],
         properties: {
           email: { type: "string", format: "email", example: "maria@email.com" },
-          password: { type: "string", example: "senha123" }
+          password: { type: "string", example: "Senha@123" }
         }
       },
       AuthResponse: {
