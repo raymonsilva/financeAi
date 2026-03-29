@@ -8,6 +8,12 @@ export class AppError extends Error {
 }
 
 export function errorMiddleware(err: Error, req: Request, res: Response, next: NextFunction) {
+    const bodyParserError = err as Error & { status?: number; type?: string };
+
+    if (bodyParserError.type === "entity.parse.failed" || bodyParserError.status === 400) {
+        return res.status(400).json({ error: "JSON inválido no corpo da requisição" });
+    }
+
     if (err instanceof AppError) {
         return res.status(err.statusCode).json({ error: err.mensage });
     }

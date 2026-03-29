@@ -10,6 +10,10 @@ const swaggerDefinition = {
   },
   servers: [
     {
+      url: "/",
+      description: "Servidor atual"
+    },
+    {
       url: "https://financecontrol-production-bb45.up.railway.app",
       description: "Servidor railway (produção)"
     }
@@ -327,7 +331,7 @@ const swaggerDefinition = {
         }
       }
     },
-    "/orçamentos/status": {
+    "/orcamentos/status": {
       get: {
         tags: ["Orçamentos"],
         summary: "Status de consumo do orçamento",

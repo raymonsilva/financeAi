@@ -68,7 +68,8 @@ const corsOptions: CorsOptions = {
       return;
     }
 
-    callback(new Error("Origin not allowed by CORS"));
+    // Avoid bubbling CORS rejections to the global error middleware as 500.
+    callback(null, false);
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
