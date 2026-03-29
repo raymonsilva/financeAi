@@ -26,27 +26,8 @@
 - **Validation:** Zod
 
 ## Routes
-
-### Auth
-- `POST /user/register`
-- `POST /user/login`
-
-### Expenses
-- `GET /gastos`
-- `POST /gastos`
-- `DELETE /gastos/:id`
-- `GET /gastos/resumo?mes=MM&ano=AAAA`
-
-### Budget
-- `GET /orcamentos?mes=MM&ano=AAAA`
-- `GET /orcamentos/status?mes=MM&ano=AAAA`
-- `POST /orcamentos`
-- `PUT /orcamentos/:id`
-- `DELETE /orcamentos/:id`
-
-### Admin
-- `GET /admin/full`
-- `DELETE /admin/cleanup`
+[![Swagger UI](https://img.shields.io/badge/Swagger-UI-85EA2D?logo=swagger&logoColor=000)](https://financecontrol-production-bb45.up.railway.app/api-docs)
+[![OpenAPI JSON](https://img.shields.io/badge/OpenAPI-JSON-6BA539)](https://financecontrol-production-bb45.up.railway.app/api-docs.json)
 
 ## Access rules
 
