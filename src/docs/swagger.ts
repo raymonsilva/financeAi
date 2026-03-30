@@ -19,7 +19,7 @@ const swaggerDefinition = {
     }
   ],
   tags: [
-    { name: "Auth", description: "Autenticacao e usuarios" },
+    { name: "Auth", description: "Autenticação e usuários" },
     { name: "Gastos", description: "Gestão de gastos" },
     { name: "Orçamentos", description: "Gestão de orçamentos mensais" },
     { name: "Admin", description: "Operações administrativas" },
@@ -86,7 +86,7 @@ const swaggerDefinition = {
       },
       OrcamentoInput: {
         type: "object",
-        required: ["mes", "ano", "valor"],
+        required: ["mês", "ano", "valor"],
         properties: {
           mes: { type: "integer", minimum: 1, maximum: 12, example: 3 },
           ano: { type: "integer", minimum: 1900, example: 2026 },
@@ -124,7 +124,7 @@ const swaggerDefinition = {
     "/user/register": {
       post: {
         tags: ["Auth"],
-        summary: "Registrar novo usuario",
+        summary: "Registrar novo usuários",
         requestBody: {
           required: true,
           content: {
@@ -135,7 +135,7 @@ const swaggerDefinition = {
         },
         responses: {
           "201": {
-            description: "Usuario criado",
+            description: "Usuário criado",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/AuthResponse" }
@@ -149,7 +149,7 @@ const swaggerDefinition = {
     "/user/login": {
       post: {
         tags: ["Auth"],
-        summary: "Login de usuario",
+        summary: "Login de usuário",
         requestBody: {
           required: true,
           content: {
@@ -174,22 +174,22 @@ const swaggerDefinition = {
     "/user": {
       get: {
         tags: ["Auth"],
-        summary: "Obter usuario autenticado",
+        summary: "Obter usuário autenticado",
         security: [{ bearerAuth: [] }],
         responses: {
-          "200": { description: "Dados do usuario" },
-          "401": { description: "Nao autenticado" }
+          "200": { description: "Dados do usuário" },
+          "401": { description: "Não autenticado" }
         }
       }
     },
     "/gastos": {
       get: {
         tags: ["Gastos"],
-        summary: "Listar gastos do usuario",
+        summary: "Listar gastos do usuário",
         security: [{ bearerAuth: [] }],
         responses: {
           "200": { description: "Lista de gastos" },
-          "401": { description: "Nao autenticado" }
+          "401": { description: "Não autenticado" }
         }
       },
       post: {
@@ -225,7 +225,7 @@ const swaggerDefinition = {
         ],
         responses: {
           "200": { description: "Gasto encontrado" },
-          "404": { description: "Gasto nao encontrado" }
+          "404": { description: "Gasto não encontrado" }
         }
       },
       put: {
@@ -250,7 +250,7 @@ const swaggerDefinition = {
         },
         responses: {
           "200": { description: "Gasto atualizado" },
-          "404": { description: "Gasto nao encontrado" }
+          "404": { description: "Gasto não encontrado" }
         }
       },
       delete: {
@@ -267,18 +267,18 @@ const swaggerDefinition = {
         ],
         responses: {
           "200": { description: "Gasto excluido" },
-          "404": { description: "Gasto nao encontrado" }
+          "404": { description: "Gasto não encontrado" }
         }
       }
     },
     "/gastos/resumo": {
       get: {
         tags: ["Gastos"],
-        summary: "Resumo mensal de gastos do usuario autenticado",
+        summary: "Resumo mensal de gastos do usuário autenticado",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: "mes",
+            name: "mês",
             in: "query",
             schema: { type: "integer", minimum: 1, maximum: 12 }
           },
@@ -300,7 +300,7 @@ const swaggerDefinition = {
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: "mes",
+            name: "mês",
             in: "query",
             schema: { type: "integer", minimum: 1, maximum: 12 }
           },
@@ -338,7 +338,7 @@ const swaggerDefinition = {
         security: [{ bearerAuth: [] }],
         parameters: [
           {
-            name: "mes",
+            name: "mês",
             in: "query",
             schema: { type: "integer", minimum: 1, maximum: 12 }
           },
